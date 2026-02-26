@@ -1,93 +1,131 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CryptoContext } from '../context/CryptoContext';
-import { formatCurrency, formatPercentage } from '../utils/formatNumber';
 
-const CryptoTable = () => {
-  const { coins, loading } = useContext(CryptoContext);
+// Components
+import Navbar from '../components/Navbar';
+import TopGainers from '../components/TopGainers';
+import CryptoTable from '../components/CryptoTable';
+import AdvancedFilters from '../components/AdvancedFilters';
+import Portfolio from '../components/Portfolio';
+import Alerts from '../components/Alerts';
+
+const Home = () => {
+  const { selectedCoin } = useContext(CryptoContext);
+  const [showPortfolio, setShowPortfolio] = useState(false);
+  const [showAlerts, setShowAlerts] = useState(false);
 
   return (
-    <div className="w-full overflow-x-auto custom-scrollbar">
-      <table className="w-full border-separate border-spacing-y-3">
-        <thead>
-          <tr className="text-slate-400 text-xs uppercase tracking-widest">
-            <th className="px-6 py-4 text-left font-bold">#</th>
-            <th className="px-6 py-4 text-left font-bold">Coin Asset</th>
-            <th className="px-6 py-4 text-right font-bold">Price</th>
-            <th className="px-6 py-4 text-right font-bold">24h Change</th>
-            <th className="px-6 py-4 text-right hidden md:table-cell font-bold">Market Cap</th>
-            <th className="px-6 py-4 text-center font-bold">Action</th>
-          </tr>
-        </thead>
+    <div className="min-h-screen bg-[#F8FAFC]">
+      
+      <Navbar />
+
+      <main className="container mx-auto px-4 lg:px-8 py-6 max-w-[1400px]">
         
-        <motion.tbody layout>
-          <AnimatePresence>
-            {coins.map((coin, index) => (
-              <motion.tr
-                key={coin.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: index * 0.03 }}
-                whileHover={{ scale: 1.01, backgroundColor: "rgba(255, 255, 255, 0.8)" }}
-                className="group bg-white/40 backdrop-blur-sm shadow-sm rounded-2xl cursor-pointer transition-all border border-white/20"
+        
+        <section className="mb-10 pt-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col md:flex-row justify-between items-end gap-6"
+          >
+            <div className="space-y-2">
+              <h2 className="text-4xl font-black tracking-tight text-slate-900">
+                Market <span className="text-indigo-600">Pulse</span>
+              </h2>
+              <p className="text-slate-500 font-medium">Global crypto assets in neural-time tracking.</p>
+            </div>
+
+            
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowPortfolio(true)}
+                className="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold shadow-sm hover:shadow-md hover:-translate-y-1 transition-all"
               >
-                {/* Rank */}
-                <td className="px-6 py-5 first:rounded-l-2xl text-sm font-bold text-slate-400">
-                  {index + 1}
-                </td>
+                💼 My Portfolio
+              </button>
+              <button 
+                onClick={() => setShowAlerts(true)}
+                className="px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold shadow-xl shadow-slate-200 hover:scale-105 active:scale-95 transition-all"
+              >
+                🔔 Smart Alerts
+              </button>
+            </div>
+          </motion.div>
+        </section>
 
-                {/* Coin Name & Symbol */}
-                <td className="px-6 py-5">
-                  <div className="flex items-center gap-3">
-                    <img src={coin.image} alt="" className="w-8 h-8 rounded-full shadow-inner" />
-                    <div>
-                      <p className="font-black text-slate-800 leading-none">{coin.symbol.toUpperCase()}</p>
-                      <p className="text-[10px] text-slate-400 font-medium mt-1 uppercase tracking-tight">{coin.name}</p>
-                    </div>
-                  </div>
-                </td>
+        
+        <motion.section 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mb-12"
+        >
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+           
+            <div className="xl:col-span-1 space-y-6">
+               <div className="bg-white/70 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-sm">
+                  <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse" />
+                    Neural Filters
+                  </h3>
+                  <AdvancedFilters />
+               </div>
+            </div>
 
-                {/* Price */}
-                <td className="px-6 py-5 text-right font-mono font-bold text-slate-700">
-                  {formatCurrency(coin.current_price)}
-                </td>
+           
+            <div className="xl:col-span-3">
+              <TopGainers />
+            </div>
+          </div>
+        </motion.section>
 
-                {/* 24h Change with Badge style */}
-                <td className="px-6 py-5 text-right">
-                  <span className={`px-3 py-1 rounded-full text-xs font-black ${
-                    coin.price_change_percentage_24h >= 0 
-                    ? 'bg-emerald-100 text-emerald-600' 
-                    : 'bg-rose-100 text-rose-600'
-                  }`}>
-                    {coin.price_change_percentage_24h >= 0 ? '▲' : '▼'} 
-                    {formatPercentage(Math.abs(coin.price_change_percentage_24h))}
-                  </span>
-                </td>
+       
+        <section className="mb-10">
+          <div className="flex items-center justify-between mb-6 px-4">
+            <h3 className="text-xl font-black text-slate-800">Global Assets</h3>
+            <div className="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full uppercase tracking-tighter">
+              Live updates every 30s
+            </div>
+          </div>
+          
+          <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.03)] p-2">
+            <CryptoTable />
+          </div>
+        </section>
 
-                {/* Market Cap (Hidden on Mobile) */}
-                <td className="px-6 py-5 text-right hidden md:table-cell text-sm font-semibold text-slate-500">
-                  {formatCurrency(coin.market_cap).slice(0, -3)}
-                </td>
+      </main>
 
-                {/* Action Buttons */}
-                <td className="px-6 py-5 last:rounded-r-2xl text-center">
-                  <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-2 hover:bg-indigo-50 text-indigo-600 rounded-xl transition-colors">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-                    </button>
-                    <button className="p-2 hover:bg-emerald-50 text-emerald-600 rounded-xl transition-colors">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-                    </button>
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
-          </AnimatePresence>
-        </motion.tbody>
-      </table>
+     
+      <AnimatePresence>
+        {showPortfolio && <Portfolio onClose={() => setShowPortfolio(false)} />}
+        {showAlerts && <Alerts onClose={() => setShowAlerts(false)} />}
+      </AnimatePresence>
+
+     
+      <AnimatePresence>
+        {selectedCoin && (
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-5xl z-50"
+          >
+            <div className="bg-white/90 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-2xl border border-white">
+              
+               <div className="flex justify-between mb-4">
+                  <h4 className="font-black">Market Analytics: {selectedCoin.toUpperCase()}</h4>
+                  <button className="text-slate-400 font-bold">Close X</button>
+               </div>
+               <div className="h-48 bg-slate-50 rounded-2xl flex items-center justify-center border-dashed border-2 border-slate-200">
+                  <p className="text-slate-400 text-sm">Neural Chart Loading...</p>
+               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
-export default CryptoTable;
+export default Home;

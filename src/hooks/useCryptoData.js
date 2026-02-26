@@ -1,4 +1,3 @@
-// This hook is now integrated in context, but you can use it to fetch specific data
 import { useState, useEffect } from 'react';
 import { fetchCoinChart } from '../api/cryptoApi';
 

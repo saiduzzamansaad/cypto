@@ -1,4 +1,3 @@
-// Not strictly needed as sorting is done in context, but we can add a generic function
 export const sortCoins = (coins, key, order = 'desc') => {
       return [...coins].sort((a, b) => {
         if (order === 'asc') {
